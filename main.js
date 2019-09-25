@@ -41,10 +41,10 @@ function getRandomIntInclusive(min, max) {
 }
 
 function startGame() {
+    gameArea.innerHTML = '';
 
     start.classList.add('hide');
-    start.style.display = 'none';
-
+    
     for (let i = 0; i < getQuantityElements(100) +1; i++) {
         const line = document.createElement('div');
         line.classList.add('line');
@@ -54,7 +54,6 @@ function startGame() {
     }
 
     for(let i = 0; i < getQuantityElements(100*settings.traffic)-1; i++){
-        console.log(getQuantityElements(100*settings.traffic));
         const enemy = document.createElement('div');
         enemy.classList.add('enemy');
         enemy.y = -100 * settings.traffic * (i+1);
@@ -64,11 +63,18 @@ function startGame() {
         getRandomIntInclusive(0,2) +
          '.png\') center / cover no-repeat';
         gameArea.appendChild(enemy);
+
+        
     }
 
+    settings.score = 0;
     settings.start = true;
     gameArea.appendChild(car);
     gameArea.appendChild(music);
+
+    car.style.top = 'auto';
+    car.style.left = (gameArea.offsetWidth / 2) - (car.offsetWidth/2);
+    car.style.bottom = '10px';
     /*music.setAttribute('autoplay',true);
     music.setAttribute('src','./audio.wav');*/
     settings.x = car.offsetLeft;
@@ -82,6 +88,8 @@ function playGame() {
     moveRoad();
     moveEnemy();
     if (settings.start) {
+        settings.score += settings.speed;
+        score.innerHTML = "SCORE<br>"+settings.score;
         if (keys.ArrowLeft && settings.x > 0) {
             settings.x -= settings.speed;
         }
@@ -95,6 +103,8 @@ function playGame() {
         if (keys.ArrowDown && settings.y < (gameArea.offsetHeight - car.offsetHeight)) {
             settings.y += settings.speed;
         }
+
+       
         car.style.left = settings.x + 'px';
         car.style.top = settings.y + 'px';
         requestAnimationFrame(playGame);
@@ -118,6 +128,19 @@ function moveEnemy(){
     let enemies = document.querySelectorAll('.enemy');
 
     enemies.forEach(function (item){
+    let carRect = car.getBoundingClientRect();
+    let enemyRect = item.getBoundingClientRect();
+
+    if(carRect.top <=enemyRect.bottom &&
+        carRect.right >= enemyRect.left &&
+        carRect.left <= enemyRect.right &&
+        carRect.bottom >= enemyRect.top){
+            // авария
+        settings.start = false;
+        start.classList.remove('hide');
+        start.style.top = score.offsetHeight;
+    }
+
     item.y += settings.speed / 2;
     item.style.top = item.y + 'px';
 
@@ -138,7 +161,6 @@ function startRun(event) {
     event.preventDefault();
     if(keys.hasOwnProperty(event.key)){
         keys[event.key] = true;
-        console.dir(event);
     }
 }
 
