@@ -1,7 +1,13 @@
 const score = document.querySelector('.score'),
     start = document.querySelector('.start'),
     gameArea = document.querySelector('.gameArea'),
-    car = document.createElement('div');
+    car = document.createElement('div'),
+    //music = document.createElement('audio');
+    music = document.createElement('embed');
+
+    music.setAttribute('src','./audio.wav');
+    music.setAttribute('type','audio/wav');
+    music.classList.add('music');
 
 car.classList.add('car');
 
@@ -20,12 +26,12 @@ const keys = {
 const settings = {
     start: false,
     score: 0,
-    speed: 15,
+    speed: 5,
     traffic: 2
 };
 
 function getQuantityElements(heigthElement){
-    return (document.documentElement.clientHeight / heigthElement) + 1;
+    return Math.ceil(gameArea.offsetHeight / heigthElement);
 }
 
 function getRandomIntInclusive(min, max) {
@@ -35,10 +41,11 @@ function getRandomIntInclusive(min, max) {
 }
 
 function startGame() {
+
     start.classList.add('hide');
     start.style.display = 'none';
 
-    for (let i = 0; i < getQuantityElements(100); i++) {
+    for (let i = 0; i < getQuantityElements(100) +1; i++) {
         const line = document.createElement('div');
         line.classList.add('line');
         line.style.top = i * 100 + 'px';
@@ -61,6 +68,9 @@ function startGame() {
 
     settings.start = true;
     gameArea.appendChild(car);
+    gameArea.appendChild(music);
+    /*music.setAttribute('autoplay',true);
+    music.setAttribute('src','./audio.wav');*/
     settings.x = car.offsetLeft;
     settings.y = car.offsetTop;
     if (settings.start) {
@@ -124,13 +134,17 @@ function moveEnemy(){
     
 }
 
-
 function startRun(event) {
     event.preventDefault();
-    keys[event.key] = true;
+    if(keys.hasOwnProperty(event.key)){
+        keys[event.key] = true;
+        console.dir(event);
+    }
 }
 
 function stopRun() {
-    keys[event.key] = false;
     event.preventDefault();
+    if(keys.hasOwnProperty(event.key)){
+    keys[event.key] = false;
+    }
 }
